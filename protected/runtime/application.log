@@ -7481,3 +7481,49 @@ Stack trace:
 #9 D:\wamp\www\societyn\framework\base\CApplication.php(180): CWebApplication->processRequest()
 #10 D:\wamp\www\societyn\index.php(16): CWebApplication->run()
 REQUEST_URI=/societyn/reportUnity/normalreport
+2014/07/04 14:56:47 [error] [system.db.CDbCommand] CDbCommand::execute() failed: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'amount' cannot be null. The SQL statement executed was: INSERT INTO `tbl_cost` (`sharje`, `income`, `unity`, `unity_status`, `date_cheque`, `description`, `cost_type_code`, `amount_sharje`, `amount_income`, `amount_unity`, `payment_code`, `transaction_num`, `bank_code`, `block_code`) VALUES (:yp0, :yp1, :yp2, :yp3, :yp4, :yp5, :yp6, :yp7, :yp8, :yp9, :yp10, :yp11, :yp12, :yp13).
+2014/07/04 14:56:47 [error] [exception.CDbException] exception 'CDbException' with message 'خطای CDbCommand در اجرای SQL statement: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'amount' cannot be null. The SQL statement executed was: INSERT INTO `tbl_cost` (`sharje`, `income`, `unity`, `unity_status`, `date_cheque`, `description`, `cost_type_code`, `amount_sharje`, `amount_income`, `amount_unity`, `payment_code`, `transaction_num`, `bank_code`, `block_code`) VALUES (:yp0, :yp1, :yp2, :yp3, :yp4, :yp5, :yp6, :yp7, :yp8, :yp9, :yp10, :yp11, :yp12, :yp13)' in D:\wamp\www\society\framework\db\CDbCommand.php:358
+Stack trace:
+#0 D:\wamp\www\society\framework\db\ar\CActiveRecord.php(1077): CDbCommand->execute()
+#1 D:\wamp\www\society\framework\db\ar\CActiveRecord.php(806): CActiveRecord->insert(NULL)
+#2 D:\wamp\www\society\protected\controllers\CostController.php(50): CActiveRecord->save()
+#3 D:\wamp\www\society\framework\web\actions\CInlineAction.php(49): CostController->actionCreate()
+#4 D:\wamp\www\society\framework\web\CController.php(308): CInlineAction->runWithParams(Array)
+#5 D:\wamp\www\society\framework\web\filters\CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#6 D:\wamp\www\society\framework\web\filters\CFilter.php(40): CFilterChain->run()
+#7 D:\wamp\www\society\protected\modules\rights\components\RController.php(36): CFilter->filter(Object(CFilterChain))
+#8 D:\wamp\www\society\framework\web\filters\CInlineFilter.php(58): RController->filterRights(Object(CFilterChain))
+#9 D:\wamp\www\society\framework\web\filters\CFilterChain.php(130): CInlineFilter->filter(Object(CFilterChain))
+#10 D:\wamp\www\society\framework\web\CController.php(291): CFilterChain->run()
+#11 D:\wamp\www\society\framework\web\CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#12 D:\wamp\www\society\framework\web\CWebApplication.php(282): CController->run('create')
+#13 D:\wamp\www\society\framework\web\CWebApplication.php(141): CWebApplication->runController('cost/create')
+#14 D:\wamp\www\society\framework\base\CApplication.php(180): CWebApplication->processRequest()
+#15 D:\wamp\www\society\index.php(16): CApplication->run()
+#16 {main}
+REQUEST_URI=/society/cost/create
+HTTP_REFERER=http://localhost/society/cost/create
+---
+2014/07/04 14:57:36 [error] [system.db.CDbCommand] CDbCommand::execute() failed: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'amount' cannot be null. The SQL statement executed was: INSERT INTO `tbl_cost` (`sharje`, `income`, `unity`, `unity_status`, `date_cheque`, `description`, `cost_type_code`, `amount_sharje`, `amount_income`, `amount_unity`, `payment_code`, `transaction_num`, `bank_code`, `block_code`) VALUES (:yp0, :yp1, :yp2, :yp3, :yp4, :yp5, :yp6, :yp7, :yp8, :yp9, :yp10, :yp11, :yp12, :yp13).
+2014/07/04 14:57:36 [error] [exception.CDbException] exception 'CDbException' with message 'خطای CDbCommand در اجرای SQL statement: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'amount' cannot be null. The SQL statement executed was: INSERT INTO `tbl_cost` (`sharje`, `income`, `unity`, `unity_status`, `date_cheque`, `description`, `cost_type_code`, `amount_sharje`, `amount_income`, `amount_unity`, `payment_code`, `transaction_num`, `bank_code`, `block_code`) VALUES (:yp0, :yp1, :yp2, :yp3, :yp4, :yp5, :yp6, :yp7, :yp8, :yp9, :yp10, :yp11, :yp12, :yp13)' in D:\wamp\www\society\framework\db\CDbCommand.php:358
+Stack trace:
+#0 D:\wamp\www\society\framework\db\ar\CActiveRecord.php(1077): CDbCommand->execute()
+#1 D:\wamp\www\society\framework\db\ar\CActiveRecord.php(806): CActiveRecord->insert(NULL)
+#2 D:\wamp\www\society\protected\controllers\CostController.php(50): CActiveRecord->save()
+#3 D:\wamp\www\society\framework\web\actions\CInlineAction.php(49): CostController->actionCreate()
+#4 D:\wamp\www\society\framework\web\CController.php(308): CInlineAction->runWithParams(Array)
+#5 D:\wamp\www\society\framework\web\filters\CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#6 D:\wamp\www\society\framework\web\filters\CFilter.php(40): CFilterChain->run()
+#7 D:\wamp\www\society\protected\modules\rights\components\RController.php(36): CFilter->filter(Object(CFilterChain))
+#8 D:\wamp\www\society\framework\web\filters\CInlineFilter.php(58): RController->filterRights(Object(CFilterChain))
+#9 D:\wamp\www\society\framework\web\filters\CFilterChain.php(130): CInlineFilter->filter(Object(CFilterChain))
+#10 D:\wamp\www\society\framework\web\CController.php(291): CFilterChain->run()
+#11 D:\wamp\www\society\framework\web\CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#12 D:\wamp\www\society\framework\web\CWebApplication.php(282): CController->run('create')
+#13 D:\wamp\www\society\framework\web\CWebApplication.php(141): CWebApplication->runController('cost/create')
+#14 D:\wamp\www\society\framework\base\CApplication.php(180): CWebApplication->processRequest()
+#15 D:\wamp\www\society\index.php(16): CApplication->run()
+#16 {main}
+REQUEST_URI=/society/cost/create
+HTTP_REFERER=http://localhost/society/cost/create
+---
