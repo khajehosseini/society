@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 04, 2014 at 10:56 AM
+-- Generation Time: Jul 04, 2014 at 03:41 PM
 -- Server version: 5.5.20
 -- PHP Version: 5.3.10
 
@@ -789,14 +789,15 @@ CREATE TABLE IF NOT EXISTS `tbl_charge` (
   KEY `bank_code` (`bank_code`),
   KEY `unity_code` (`unity_code`),
   KEY `user_code` (`user_code`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول پرداخت شارژ' AUTO_INCREMENT=18 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول پرداخت شارژ' AUTO_INCREMENT=19 ;
 
 --
 -- Dumping data for table `tbl_charge`
 --
 
 INSERT INTO `tbl_charge` (`id`, `unity_code`, `user_code`, `month_code`, `year_code`, `payment_code`, `amount`, `transaction_num`, `date_cheque`, `bank_code`, `create_date`) VALUES
-(17, 6, 10, 1, 2, 1, '20000', '', '0000-00-00 00:00:00', NULL, '2014-06-04 16:53:24');
+(17, 6, 10, 1, 2, 1, '20000', '', '0000-00-00 00:00:00', NULL, '2014-06-04 16:53:24'),
+(18, 7, 12, 1, 2, 1, '10000', '', '0000-00-00 00:00:00', NULL, '2014-07-04 13:58:43');
 
 -- --------------------------------------------------------
 
@@ -880,7 +881,7 @@ CREATE TABLE IF NOT EXISTS `tbl_compute_stage` (
   `amount` varchar(255) COLLATE utf8_persian_ci NOT NULL,
   `stage_count` int(11) NOT NULL DEFAULT '0' COMMENT 'تعداد واحد',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci COMMENT='جدول موقت برای محسابه هزینه طبقات' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci COMMENT='جدول موقت برای محسابه هزینه طبقات' AUTO_INCREMENT=11 ;
 
 -- --------------------------------------------------------
 
@@ -911,7 +912,15 @@ CREATE TABLE IF NOT EXISTS `tbl_cost` (
   KEY `cost_type_code` (`cost_type_code`),
   KEY `payment_code` (`payment_code`),
   KEY `bank_code` (`bank_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='هزینه ها' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='هزینه ها' AUTO_INCREMENT=6 ;
+
+--
+-- Dumping data for table `tbl_cost`
+--
+
+INSERT INTO `tbl_cost` (`id`, `block_code`, `description`, `cost_type_code`, `amount_sharje`, `amount_income`, `amount_unity`, `sharje`, `income`, `unity`, `unity_status`, `payment_code`, `transaction_num`, `date_cheque`, `bank_code`, `create_date`) VALUES
+(1, 3, 'هزینه x', 1, 0, 0, 100000, 0, 0, 1, 1, 1, '', '2014-07-03 19:30:00', NULL, '2014-07-04 14:23:16'),
+(4, 3, 'هزینه U', 5, 0, 0, 100000, 0, 0, 1, 1, 1, '', '2014-07-03 19:30:00', NULL, '2014-07-04 15:14:48');
 
 --
 -- Triggers `tbl_cost`
@@ -947,7 +956,7 @@ INSERT INTO `tbl_cost_type` (`id`, `cost_type_mode_code`, `title`) VALUES
 (3, 1, 'گاز'),
 (4, 4, 'آسانسور'),
 (5, 2, 'سرایداری'),
-(6, 2, 'شوفاژ خانه');
+(6, 3, 'شوفاژ خانه');
 
 -- --------------------------------------------------------
 
@@ -988,7 +997,33 @@ CREATE TABLE IF NOT EXISTS `tbl_cost_unity` (
   KEY `cost_code` (`cost_code`),
   KEY `unity_code` (`unity_code`),
   KEY `user_code` (`user_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci COMMENT='جدول ریز هزینه واحد' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci COMMENT='جدول ریز هزینه واحد' AUTO_INCREMENT=28 ;
+
+--
+-- Dumping data for table `tbl_cost_unity`
+--
+
+INSERT INTO `tbl_cost_unity` (`id`, `cost_code`, `user_code`, `unity_code`, `amount`, `create_date`) VALUES
+(1, 1, 18, 5, '7750', '2014-07-04 14:23:16'),
+(2, 1, 10, 6, '11625', '2014-07-04 14:23:16'),
+(3, 1, 12, 7, '9300', '2014-07-04 14:23:16'),
+(4, 1, 13, 8, '12400', '2014-07-04 14:23:16'),
+(5, 1, 19, 9, '10075', '2014-07-04 14:23:16'),
+(6, 1, 14, 10, '11625', '2014-07-04 14:23:16'),
+(7, 1, 20, 11, '9300', '2014-07-04 14:23:16'),
+(8, 1, 15, 12, '7750', '2014-07-04 14:23:16'),
+(9, 1, 16, 13, '9300', '2014-07-04 14:23:16'),
+(10, 1, 17, 14, '10850', '2014-07-04 14:23:16'),
+(15, 4, 18, 5, '10000', '2014-07-04 15:14:48'),
+(16, 4, 10, 6, '10000', '2014-07-04 15:14:48'),
+(17, 4, 12, 7, '10000', '2014-07-04 15:14:48'),
+(18, 4, 13, 8, '10000', '2014-07-04 15:14:48'),
+(19, 4, 19, 9, '10000', '2014-07-04 15:14:48'),
+(20, 4, 14, 10, '10000', '2014-07-04 15:14:48'),
+(21, 4, 20, 11, '10000', '2014-07-04 15:14:48'),
+(22, 4, 15, 12, '10000', '2014-07-04 15:14:48'),
+(23, 4, 16, 13, '10000', '2014-07-04 15:14:48'),
+(24, 4, 17, 14, '10000', '2014-07-04 15:14:48');
 
 -- --------------------------------------------------------
 
@@ -1335,10 +1370,10 @@ CREATE TABLE IF NOT EXISTS `tbl_users` (
 
 INSERT INTO `tbl_users` (`id`, `username`, `password`, `email`, `activkey`, `create_at`, `lastvisit_at`, `superuser`, `status`) VALUES
 (1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 'webmaster@example.com', '9a24eff8c15a6a141ece27eb6947da0f', '2013-12-03 10:16:26', '2014-06-05 03:46:04', 1, 1),
-(2, 'khajehossini', 'e10adc3949ba59abbe56e057f20f883e', 'khajehossini@gmail.com5', 'c577fa5e0de9361458fc92fee6238af4', '2013-12-17 06:38:52', '2014-06-04 11:13:56', 0, 1),
-(10, 'mohammadsafari', 'e10adc3949ba59abbe56e057f20f883e', 'mohammadsafari@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 05:34:32', '2014-06-05 11:23:38', 0, 1),
-(11, 'ahmmademami', 'e10adc3949ba59abbe56e057f20f883e', 'ahmmademami@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-05-06 01:41:56', 0, 1),
-(12, 'nimahasani', 'e10adc3949ba59abbe56e057f20f883e', 'nimahasani@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-05-06 01:24:30', 0, 1),
+(2, 'khajehossini', 'e10adc3949ba59abbe56e057f20f883e', 'khajehossini@gmail.com5', 'c577fa5e0de9361458fc92fee6238af4', '2013-12-17 06:38:52', '2014-07-04 10:49:54', 0, 1),
+(10, 'mohammadsafari', 'e10adc3949ba59abbe56e057f20f883e', 'mohammadsafari@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 05:34:32', '2014-07-04 10:51:56', 0, 1),
+(11, 'ahmmademami', 'e10adc3949ba59abbe56e057f20f883e', 'ahmmademami@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-07-04 09:19:59', 0, 1),
+(12, 'nimahasani', 'e10adc3949ba59abbe56e057f20f883e', 'nimahasani@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-07-04 09:26:19', 0, 1),
 (13, 'amirhashemi', 'e10adc3949ba59abbe56e057f20f883e', 'amirhashemi@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '0000-00-00 00:00:00', 0, 1),
 (14, 'hasanbayat', 'e10adc3949ba59abbe56e057f20f883e', 'hasanbayat@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-06-04 11:52:07', 0, 1),
 (15, 'mahmodeftekhari', 'e10adc3949ba59abbe56e057f20f883e', 'mahmodeftekhari@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '0000-00-00 00:00:00', 0, 1),
