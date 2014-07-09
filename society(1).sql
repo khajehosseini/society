@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 04, 2014 at 03:41 PM
+-- Generation Time: Jul 09, 2014 at 03:16 PM
 -- Server version: 5.5.20
 -- PHP Version: 5.3.10
 
@@ -106,9 +106,9 @@ BEGIN
 	DECLARE	done INT;
 	DECLARE	StageNum INT;
 	DECLARE listUnity	CURSOR FOR 
-		SELECT 	TU.stage	as stage FROM tbl_unity TU 
-		JOIN tbl_leaseholder TL ON (TU.id	=	TL.unity_code)
-		where TU.block_code	=	BlockId	and TL.status	=	1 ;
+                SELECT 	TU.stage	as stage FROM tbl_unity TU 
+		JOIN  tbl_householder TH ON (TU.id	=	TH.unity_code)
+		where TU.block_code	=	BlockId	and TH.status	=	1 ;
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	OPEN listUnity;
 	mainLoop : LOOP
@@ -275,11 +275,26 @@ DECLARE	Mul		int;
 DECLARE	UserId	int;
 DECLARE	PersonCount		int;
 DECLARE listUnity	CURSOR FOR 
-
+select a.id , a.person_count  from (
 SELECT TU.id as id	,	TP.person_count	as person_count FROM tbl_unity TU 
 JOIN tbl_leaseholder TL ON (TU.id	=	TL.unity_code)
 JOIN tbl_profiles TP ON (TL.user_code	=	TP.user_id)
-where TU.block_code	=	BlockId	and TL.status	=	1 ;
+where TU.block_code	=	BlockId	and TL.status	=	1 
+
+UNION
+
+SELECT TU.id as id	,	TP.person_count	as person_count FROM tbl_unity TU 
+JOIN tbl_householder TH ON (TU.id	=	TH.unity_code)
+JOIN tbl_profiles TP ON (TH.user_code	=	TP.user_id)
+where TU.block_code	=	BlockId		and TH.status	=	1 and TH.unity_code NOT IN (
+SELECT TL.unity_code  FROM tbl_leaseholder TL 
+join tbl_unity U on (TL.unity_code=U.id)
+	WHERE TL.status	=	1 and U.block_code	=BlockId
+
+)
+
+) as a;
+
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET counter = TRUE;
 OPEN listUnity;
 mainLoop : LOOP
@@ -334,9 +349,28 @@ END$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getOnePersonCost`(IN `BlockId` INT, IN `TotalAmount` INT, OUT `OnePersonCost` INT)
 BEGIN
 	declare TotalPerson	INT;
-	SELECT SUM(TP.person_count) INTO TotalPerson FROM tbl_leaseholder TL  
+
+
+select sum(a.sum_person) INTO TotalPerson from (
+SELECT sum(TP.person_count) as sum_person  FROM tbl_leaseholder TL  
 	JOIN tbl_profiles TP	ON (TP.user_id	=	TL.user_code)	
-	WHERE TL.status	=	1 ;
+	join tbl_unity U on (TL.unity_code=U.id)
+	WHERE TL.status	=	1 and U.block_code	=BlockId
+	
+UNION
+SELECT sum(TP.person_count) as sum_person FROM tbl_householder TH 
+JOIN tbl_profiles TP	ON (TP.user_id	=	TH.user_code)	
+join tbl_unity U on (TH.unity_code=U.id)
+WHERE TH.status	=	1 and U.block_code	=3 and TH.unity_code NOT IN (
+SELECT TL.unity_code  FROM tbl_leaseholder TL 
+join tbl_unity U on (TL.unity_code=U.id)
+	WHERE TL.status	=	1 and U.block_code	=BlockId
+
+)
+
+) as a ;
+
+
 	SET	OnePersonCost	=	TotalAmount	/	TotalPerson;
 END$$
 
@@ -429,7 +463,7 @@ IF 	Unity	=	1	THEN
 
 	/*SortNumber is total stage */
 		call	ComputeCountUnityInStage (BlockId);
-		call	ComputeStageZero	(SortNumber); /* SortNumber is total stage */
+		/* call	ComputeStageZero	(SortNumber); */ /* SortNumber is total stage */
 		call	ComputeType4 ( CostId 	, BlockId ,UnityStatus );
 		call 	truncateComputeStage();
 		 
@@ -881,7 +915,7 @@ CREATE TABLE IF NOT EXISTS `tbl_compute_stage` (
   `amount` varchar(255) COLLATE utf8_persian_ci NOT NULL,
   `stage_count` int(11) NOT NULL DEFAULT '0' COMMENT 'تعداد واحد',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci COMMENT='جدول موقت برای محسابه هزینه طبقات' AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci COMMENT='جدول موقت برای محسابه هزینه طبقات' AUTO_INCREMENT=6 ;
 
 -- --------------------------------------------------------
 
@@ -912,7 +946,7 @@ CREATE TABLE IF NOT EXISTS `tbl_cost` (
   KEY `cost_type_code` (`cost_type_code`),
   KEY `payment_code` (`payment_code`),
   KEY `bank_code` (`bank_code`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='هزینه ها' AUTO_INCREMENT=6 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='هزینه ها' AUTO_INCREMENT=16 ;
 
 --
 -- Dumping data for table `tbl_cost`
@@ -920,7 +954,9 @@ CREATE TABLE IF NOT EXISTS `tbl_cost` (
 
 INSERT INTO `tbl_cost` (`id`, `block_code`, `description`, `cost_type_code`, `amount_sharje`, `amount_income`, `amount_unity`, `sharje`, `income`, `unity`, `unity_status`, `payment_code`, `transaction_num`, `date_cheque`, `bank_code`, `create_date`) VALUES
 (1, 3, 'هزینه x', 1, 0, 0, 100000, 0, 0, 1, 1, 1, '', '2014-07-03 19:30:00', NULL, '2014-07-04 14:23:16'),
-(4, 3, 'هزینه U', 5, 0, 0, 100000, 0, 0, 1, 1, 1, '', '2014-07-03 19:30:00', NULL, '2014-07-04 15:14:48');
+(4, 3, 'هزینه U', 5, 0, 0, 100000, 0, 0, 1, 1, 1, '', '2014-07-03 19:30:00', NULL, '2014-07-04 15:14:48'),
+(13, 3, 'هزینه y', 2, 0, 0, 100000, 0, 0, 1, 1, 1, '', '2014-07-08 19:30:00', NULL, '2014-07-09 07:23:32'),
+(15, 3, 'هزینه eee', 6, 0, 0, 100000, 0, 0, 1, 1, 1, '', '2014-07-08 19:30:00', NULL, '2014-07-09 08:12:46');
 
 --
 -- Triggers `tbl_cost`
@@ -997,7 +1033,7 @@ CREATE TABLE IF NOT EXISTS `tbl_cost_unity` (
   KEY `cost_code` (`cost_code`),
   KEY `unity_code` (`unity_code`),
   KEY `user_code` (`user_code`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci COMMENT='جدول ریز هزینه واحد' AUTO_INCREMENT=28 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci COMMENT='جدول ریز هزینه واحد' AUTO_INCREMENT=60 ;
 
 --
 -- Dumping data for table `tbl_cost_unity`
@@ -1023,7 +1059,27 @@ INSERT INTO `tbl_cost_unity` (`id`, `cost_code`, `user_code`, `unity_code`, `amo
 (21, 4, 20, 11, '10000', '2014-07-04 15:14:48'),
 (22, 4, 15, 12, '10000', '2014-07-04 15:14:48'),
 (23, 4, 16, 13, '10000', '2014-07-04 15:14:48'),
-(24, 4, 17, 14, '10000', '2014-07-04 15:14:48');
+(24, 4, 17, 14, '10000', '2014-07-04 15:14:48'),
+(37, 13, 18, 5, '9998', '2014-07-09 07:23:32'),
+(38, 13, 10, 6, '9998', '2014-07-09 07:23:32'),
+(39, 13, 12, 7, '9999', '2014-07-09 07:23:32'),
+(40, 13, 13, 8, '9999', '2014-07-09 07:23:32'),
+(41, 13, 19, 9, '10000', '2014-07-09 07:23:32'),
+(42, 13, 14, 10, '10000', '2014-07-09 07:23:32'),
+(43, 13, 20, 11, '10001', '2014-07-09 07:23:32'),
+(44, 13, 15, 12, '10001', '2014-07-09 07:23:32'),
+(45, 13, 16, 13, '10002', '2014-07-09 07:23:32'),
+(46, 13, 17, 14, '10002', '2014-07-09 07:23:32'),
+(50, 15, 18, 5, '10000', '2014-07-09 08:12:46'),
+(51, 15, 19, 9, '10000', '2014-07-09 08:12:46'),
+(52, 15, 20, 11, '10000', '2014-07-09 08:12:46'),
+(53, 15, 10, 6, '10000', '2014-07-09 08:12:46'),
+(54, 15, 12, 7, '10000', '2014-07-09 08:12:46'),
+(55, 15, 13, 8, '10000', '2014-07-09 08:12:46'),
+(56, 15, 14, 10, '10000', '2014-07-09 08:12:46'),
+(57, 15, 15, 12, '10000', '2014-07-09 08:12:46'),
+(58, 15, 16, 13, '10000', '2014-07-09 08:12:46'),
+(59, 15, 17, 14, '10000', '2014-07-09 08:12:46');
 
 -- --------------------------------------------------------
 
@@ -1370,16 +1426,16 @@ CREATE TABLE IF NOT EXISTS `tbl_users` (
 
 INSERT INTO `tbl_users` (`id`, `username`, `password`, `email`, `activkey`, `create_at`, `lastvisit_at`, `superuser`, `status`) VALUES
 (1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 'webmaster@example.com', '9a24eff8c15a6a141ece27eb6947da0f', '2013-12-03 10:16:26', '2014-06-05 03:46:04', 1, 1),
-(2, 'khajehossini', 'e10adc3949ba59abbe56e057f20f883e', 'khajehossini@gmail.com5', 'c577fa5e0de9361458fc92fee6238af4', '2013-12-17 06:38:52', '2014-07-04 10:49:54', 0, 1),
-(10, 'mohammadsafari', 'e10adc3949ba59abbe56e057f20f883e', 'mohammadsafari@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 05:34:32', '2014-07-04 10:51:56', 0, 1),
+(2, 'khajehossini', 'e10adc3949ba59abbe56e057f20f883e', 'khajehossini@gmail.com5', 'c577fa5e0de9361458fc92fee6238af4', '2013-12-17 06:38:52', '2014-07-09 03:26:37', 0, 1),
+(10, 'mohammadsafari', 'e10adc3949ba59abbe56e057f20f883e', 'mohammadsafari@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 05:34:32', '2014-07-09 04:46:49', 0, 1),
 (11, 'ahmmademami', 'e10adc3949ba59abbe56e057f20f883e', 'ahmmademami@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-07-04 09:19:59', 0, 1),
 (12, 'nimahasani', 'e10adc3949ba59abbe56e057f20f883e', 'nimahasani@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-07-04 09:26:19', 0, 1),
 (13, 'amirhashemi', 'e10adc3949ba59abbe56e057f20f883e', 'amirhashemi@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '0000-00-00 00:00:00', 0, 1),
-(14, 'hasanbayat', 'e10adc3949ba59abbe56e057f20f883e', 'hasanbayat@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-06-04 11:52:07', 0, 1),
+(14, 'hasanbayat', 'e10adc3949ba59abbe56e057f20f883e', 'hasanbayat@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-07-09 03:44:03', 0, 1),
 (15, 'mahmodeftekhari', 'e10adc3949ba59abbe56e057f20f883e', 'mahmodeftekhari@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '0000-00-00 00:00:00', 0, 1),
 (16, 'maziyarhemati', 'e10adc3949ba59abbe56e057f20f883e', 'maziyarhemati@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '0000-00-00 00:00:00', 0, 1),
-(17, 'hosseinazadi', 'e10adc3949ba59abbe56e057f20f883e', 'hosseinazadi@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '0000-00-00 00:00:00', 0, 1),
-(18, 'mohammadakbari', 'e10adc3949ba59abbe56e057f20f883e', 'mohammadakbari@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '0000-00-00 00:00:00', 0, 1),
+(17, 'hosseinazadi', 'e10adc3949ba59abbe56e057f20f883e', 'hosseinazadi@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-07-09 02:55:48', 0, 1),
+(18, 'mohammadakbari', 'e10adc3949ba59abbe56e057f20f883e', 'mohammadakbari@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-07-09 02:54:57', 0, 1),
 (19, 'arsalanebadi', 'e10adc3949ba59abbe56e057f20f883e', 'arsalanebadi@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '0000-00-00 00:00:00', 0, 1),
 (20, 'faridpursaeed', 'e10adc3949ba59abbe56e057f20f883e', 'faridpursaeed@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '0000-00-00 00:00:00', 0, 1),
 (21, 'aminariya', 'e10adc3949ba59abbe56e057f20f883e', 'aminariya@gmail.com', '0792755fc311c4cf831d0ca17be13e24', '2014-05-03 01:04:32', '2014-06-04 11:14:45', 0, 1),
